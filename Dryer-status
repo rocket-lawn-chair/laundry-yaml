@@ -1,0 +1,11 @@
+{% if states.binary_sensor.dryer_run_completed.state == 'on' and states('input_boolean.dryer_full') == 'on' %}
+  Cycle Complete - Unload
+{% elif states.binary_sensor.dryer_run_completed.state == 'on' and states('input_boolean.dryer_full') == 'off' %}
+  Off
+{% elif states.sensor.dryer.state == 'on' %}
+  Running
+{% elif states.sensor.dryer.state == 'off' %}
+  Off
+{% else %}
+  Error
+{% endif %}
