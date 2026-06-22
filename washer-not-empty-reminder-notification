@@ -1,0 +1,75 @@
+alias: Washer Not Emptied Reminder - Notification
+description: ""
+triggers:
+  - trigger: time
+    at: "23:00:00"
+conditions:
+  - condition: state
+    entity_id: input_boolean.washer_full
+    state: "on"
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: person.michael
+            state:
+              - home
+          - condition: state
+            entity_id: person.queen_supreme
+            state:
+              - home
+        sequence:
+          - action: notify.mobile_app_michaels_iphone
+            data:
+              title: Load still in Washer
+              message: Remember to empty laundry!
+              data:
+                tag: washer-complete-notification
+            continue_on_error: true
+          - action: notify.mobile_app_rachels_iphone
+            data:
+              title: Load still in Washer
+              message: Remember to empty laundry!
+              data:
+                tag: washer-complete-notification
+            continue_on_error: true
+        alias: If both home
+      - conditions:
+          - condition: state
+            entity_id: person.michael
+            state:
+              - home
+          - condition: state
+            entity_id: person.queen_supreme
+            state:
+              - not_home
+        sequence:
+          - action: notify.mobile_app_michaels_iphone
+            data:
+              title: Load still in Washer
+              message: Remember to empty laundry!
+              data:
+                tag: washer-complete-notification
+            continue_on_error: true
+        alias: Michael Home
+      - conditions:
+          - condition: state
+            entity_id: person.queen_supreme
+            state:
+              - home
+          - condition: state
+            entity_id: person.michael
+            state:
+              - not_home
+        sequence:
+          - action: notify.mobile_app_rachels_iphone
+            data:
+              title: Load still in Washer
+              message: Remember to empty laundry!
+              data:
+                tag: washer-complete-notification
+            continue_on_error: true
+        alias: Rachel Home
+    continue_on_error: true
+    default:
+      - stop: No one home
