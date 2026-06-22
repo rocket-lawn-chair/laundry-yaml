@@ -1,0 +1,11 @@
+{% if states.binary_sensor.washer_run_completed.state == 'on' and states('input_boolean.washer_full') == 'on' %}
+  Cycle Complete - Unload
+{% elif states.binary_sensor.washer_run_completed.state == 'on' and states('input_boolean.washer_full') == 'off' %}
+  Off
+{% elif states.sensor.washer.state == 'on' %}
+  Running
+{% elif states.sensor.washer.state == 'off' %}
+  Off
+{% else %}
+  Error
+{% endif %}
