@@ -1,0 +1,52 @@
+alias: Dryer Full Tracking
+description: ""
+triggers:
+  - trigger: state
+    entity_id: sensor.dryer_run_state
+    to: Drying
+  - trigger: state
+    entity_id: binary_sensor.dryer_run_completed
+    to: "off"
+    enabled: true
+  - trigger: state
+    entity_id: binary_sensor.aqara_t1_door_sensor_1_opening
+    to: "on"
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == 'sensor.dryer_run_state' }}"
+            alias: Triggered by cycle start
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.dryer_full
+        alias: Start Dry Cycle
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.entity_id == 'binary_sensor.dryer_run_completed' }}"
+            alias: Triggered by cycle complete
+            enabled: true
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.dryer_full
+            enabled: true
+        alias: Run completed turns off
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ trigger.entity_id ==
+              'binary_sensor.aqara_t1_door_sensor_1_opening' }}
+            alias: Triggered by door sensor
+          - condition: state
+            entity_id: binary_sensor.dryer_run_completed
+            state: "on"
+        sequence:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.dryer_full
+          - action: script.clear_ios_notification_dryer_complete
+            metadata: {}
+            data: {}
+        alias: Door Open
